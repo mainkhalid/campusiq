@@ -58,7 +58,9 @@ INSTALLED_APPS = [
     'scholarships',
     'news',
     'aiconfig',
-    'crawler'
+    'crawler',
+    'aibot',
+    'settings_app',
 ]
 
 MIDDLEWARE = [

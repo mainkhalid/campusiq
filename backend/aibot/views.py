@@ -2,18 +2,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .service import ai_service
+from .models import Conversation
 
 
 class ChatView(APIView):
     """
     POST /api/aibot/chat/
-    Body: { message: string, history: [{role, content}] }
+    Body: { message: string, chat_id: string (optional), active_topic: string (optional) }
     """
     permission_classes = [AllowAny]
 
     def post(self, request):
         message = request.data.get('message', '').strip()
-        history = request.data.get('history', [])
+        chat_id = request.data.get('chat_id', None)
 
         if not message:
             return Response(
@@ -21,7 +22,18 @@ class ChatView(APIView):
                 status=400
             )
 
-        result = ai_service.chat(message, history)
+        conversation = None
+        if chat_id:
+            try:
+                conversation = Conversation.objects.get(id=chat_id)
+            except (Conversation.DoesNotExist, ValueError):
+                pass
+        
+        if not conversation:
+            conversation = Conversation.objects.create()
+
+        result = ai_service.chat(message, conversation=conversation)
+        result['chat_id'] = str(conversation.id)
 
         return Response({
             'success': not result.get('error', False),

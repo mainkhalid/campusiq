@@ -28,5 +28,7 @@ class ProgrammeListSerializer(serializers.ModelSerializer):
             'duration_semesters', 'is_active',
             'entry_requirements',
             'fee_structure',
+            'fee_per_semester',   
+            'semesters',
             'total_programme_cost',
         ]

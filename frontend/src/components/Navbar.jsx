@@ -34,7 +34,7 @@ const Navbar = () => {
       hasDropdown: true,
       subLinks: [
         { name: 'How to Apply', href: '/admissions' },
-        { name: 'Online Application Portal', href: 'https://sajili.zetech.ac.ke/index.php' },
+        { name: 'Online Application Portal', href: 'https://sajili.zetech.ac.ke/index.php', external: true },
         { name: 'Entry Requirements', href: '/admissions/requirements' },
         { name: 'Fee Structure', href: '/admissions/fees' },
         { name: 'Scholarships & Financial Aid', href: '/admissions/scholarships' },
@@ -47,14 +47,12 @@ const Navbar = () => {
       href: '/academics', 
       hasDropdown: true,
       subLinks: [
-        { name: 'All Programs', href: '/programs' },
-        { name: 'Undergraduate Programs', href: '/programs?category=Undergraduate' },
-        { name: 'Postgraduate Programs', href: '/programs?category=Postgraduate' },
-        { name: 'Diploma Courses', href: '/programs?category=Diploma' },
-        { name: 'Certificate Courses', href: '/programs?category=Certificate' },
-        { name: 'TVET Courses', href: '/programs?category=TVET' },
-        { name: 'Academic Calendar', href: '/academics/calendar' },
-        { name: 'Schools & Faculties', href: '/academics/schools' },
+        { name: 'All Programs',           href: '/academics' },
+        { name: 'Postgraduate Programs',   href: '/academics?level=Masters' },
+        { name: 'Degree Courses',          href: '/academics?level=Degree' },
+        { name: 'Diploma Courses',         href: '/academics?level=Diploma' },
+        { name: 'Certificate Courses',     href: '/academics?level=Certificate' },
+        { name: 'TVET Courses',            href: '/academics?level=TVET' },
       ]
     },
     { 
@@ -161,13 +159,25 @@ const Navbar = () => {
                   <div className="absolute top-full left-0 w-64 bg-white shadow-xl border-t-2 border-orange-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                     <div className="py-2">
                       {link.subLinks.map((sub) => (
-                        <Link
-                          key={sub.name}
-                          to={sub.href}
-                          className="block px-4 py-2 text-[12px] text-slate-700 hover:bg-slate-50 hover:text-[#1a2b4c] font-semibold transition-colors"
-                        >
-                          {sub.name}
-                        </Link>
+                        sub.external ? (
+                          <a
+                            key={sub.name}
+                            href={sub.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block px-4 py-2 text-[12px] text-slate-700 hover:bg-slate-50 hover:text-[#1a2b4c] font-semibold transition-colors"
+                          >
+                            {sub.name}
+                          </a>
+                        ) : (
+                          <Link
+                            key={sub.name}
+                            to={sub.href}
+                            className="block px-4 py-2 text-[12px] text-slate-700 hover:bg-slate-50 hover:text-[#1a2b4c] font-semibold transition-colors"
+                          >
+                            {sub.name}
+                          </Link>
+                        )
                       ))}
                     </div>
                   </div>
@@ -218,14 +228,26 @@ const Navbar = () => {
               {link.subLinks && (
                 <div className="bg-slate-50 pl-6 py-2">
                   {link.subLinks.map((sub) => (
-                    <Link 
-                      key={sub.name} 
-                      to={sub.href}
-                      onClick={() => setIsOpen(false)} 
-                      className="block py-2 text-sm text-slate-600 font-medium hover:text-orange-600 transition-colors"
-                    >
-                      {sub.name}
-                    </Link>
+                    sub.external ? (
+                      <a
+                        key={sub.name}
+                        href={sub.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block py-2 text-sm text-slate-600 font-medium hover:text-orange-600 transition-colors"
+                      >
+                        {sub.name}
+                      </a>
+                    ) : (
+                      <Link
+                        key={sub.name}
+                        to={sub.href}
+                        onClick={() => setIsOpen(false)}
+                        className="block py-2 text-sm text-slate-600 font-medium hover:text-orange-600 transition-colors"
+                      >
+                        {sub.name}
+                      </Link>
+                    )
                   ))}
                 </div>
               )}

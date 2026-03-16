@@ -32,7 +32,7 @@ class Programme(models.Model):
 
     # ── Core fields (used by frontend + AI bot) ──────────────
     name = models.CharField(max_length=255, db_index=True)
-    code = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    code = models.CharField(max_length=20, blank=True, null=True, default=None)
     school = models.CharField(max_length=50, choices=SCHOOL_CHOICES, db_index=True)
     level = models.CharField(max_length=50, choices=LEVEL_CHOICES, db_index=True)
     mean_grade = models.CharField(max_length=10, blank=True)
@@ -50,10 +50,10 @@ class Programme(models.Model):
     duration_years = models.PositiveIntegerField(null=True, blank=True)
     duration_semesters = models.PositiveIntegerField(null=True, blank=True)
 
-    # ── Simple string arrays ──────────────────────────────────
-    # ArrayField is PostgreSQL-native — stores as a real array column.
-    # default=list (not default=[]) avoids the mutable default argument
-    # bug that would share the same list across all model instances.
+    # ── Fees ─────────────────────────────────────────────────
+    fee_per_semester = models.PositiveIntegerField(null=True, blank=True)
+    semesters = models.PositiveIntegerField(null=True, blank=True)
+
     careers = ArrayField(
         models.CharField(max_length=255),
         blank=True, default=list
@@ -75,12 +75,6 @@ class Programme(models.Model):
         blank=True, default=list
     )
 
-    # ── Complex nested data (store as-is, never queried inside) ──
-    # JSONField stores any valid JSON. Django handles
-    # serialization/deserialization automatically.
-    # Your AI bot reads entryRequirements.minimumGrade —
-    # that's a Python dict key access, not a DB query,
-    # so JSONField is perfectly fine here.
     units = models.JSONField(default=list, blank=True)
     fee_structure = models.JSONField(default=list, blank=True)
     career_paths = models.JSONField(default=list, blank=True)
@@ -99,7 +93,6 @@ class Programme(models.Model):
     def __str__(self):
         return f"{self.code} — {self.name}"
 
-    # These replace your Mongoose virtuals
     @property
     def total_programme_cost(self):
         if not self.fee_structure:

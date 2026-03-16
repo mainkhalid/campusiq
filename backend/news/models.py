@@ -14,40 +14,40 @@ class NewsPost(models.Model):
         ('published', 'Published'),
     ]
 
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-    category = models.CharField(
+    title         = models.CharField(max_length=255)
+    content       = models.TextField()
+    category      = models.CharField(
         max_length=20, choices=CATEGORY_CHOICES,
         default='news', db_index=True
     )
-    status = models.CharField(
+    status        = models.CharField(
         max_length=10, choices=STATUS_CHOICES,
         default='draft', db_index=True
     )
-   
-    event_date = models.DateField(null=True, blank=True)
-    author = models.CharField(max_length=255, blank=True)
-    tags = ArrayField(
+    event_date    = models.DateField(null=True, blank=True)
+    author        = models.CharField(max_length=255, blank=True)
+    tags          = ArrayField(
         models.CharField(max_length=100),
         blank=True, default=list
     )
     external_link = models.URLField(blank=True)
-    thumbnail = models.ImageField(
-        upload_to='news/thumbnails/',
-        blank=True, null=True
-    )
-    created_by = models.ForeignKey(
+
+    # Changed: ImageField → JSONField to store Cloudinary response dict
+    # { "url": "https://res.cloudinary.com/...", "public_id": "...", "width": ..., "height": ... }
+    thumbnail     = models.JSONField(default=dict, blank=True)
+
+    created_by    = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True, blank=True,
         related_name='news_posts'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at    = models.DateTimeField(auto_now_add=True)
+    updated_at    = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
-        indexes = [
+        indexes  = [
             models.Index(fields=['status', 'category']),
         ]
 

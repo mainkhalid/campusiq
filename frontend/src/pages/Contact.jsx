@@ -1,217 +1,268 @@
-import React, { useState } from 'react';
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Clock,
-  Send,
-  MessageSquare,
-  Users,
-  Building2,
-  CheckCircle
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react'
+import {
+  Phone, Mail, MapPin, Clock, MessageCircle,
+  ArrowRight, ExternalLink, Users, BookOpen,
+  DollarSign, Headphones, Globe, Copy, CheckCheck
+} from 'lucide-react'
+import api from '../api/axios'
 
-const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
+const FALLBACK = {
+  phone_primary:    '+254 709 912 000',
+  phone_secondary:  '+254 746 071 362',
+  email_general:    'info@zetech.ac.ke',
+  email_admissions: 'admissions@zetech.ac.ke',
+  email_support:    'support@zetech.ac.ke',
+  whatsapp:         '254746071362',
+  address:          'Zetech University, Ruiru Campus, Off Thika Road, Ruiru, Kenya',
+}
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+const DEPARTMENTS = [
+  { name: 'Admissions Office',  icon: Users,     email: 'admissions@zetech.ac.ke', desc: 'Applications, intake dates, entry requirements'  },
+  { name: 'Academic Affairs',   icon: BookOpen,  email: 'academics@zetech.ac.ke',  desc: 'Programmes, timetables, transcripts'              },
+  { name: 'Finance Office',     icon: DollarSign,email: 'finance@zetech.ac.ke',    desc: 'Fee payments, HELB, invoices'                     },
+  { name: 'Student Services',   icon: Headphones,email: 'students@zetech.ac.ke',   desc: 'Welfare, counselling, ID cards, clubs'            },
+  { name: 'ICT Support',        icon: Globe,     email: 'ict@zetech.ac.ke',        desc: 'Portal access, email, technical issues'           },
+]
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsSubmitted(true);
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    }, 3000);
-  };
+const CAMPUSES = [
+  {
+    name:    'Ruiru Campus (Main)',
+    address: 'Off Thika Road, Ruiru',
+    hours:   'Mon–Fri: 7:30am – 5:00pm',
+    mapUrl:  'https://maps.google.com/?q=Zetech+University+Ruiru',
+    badge:   'Headquarters',
+  },
+  {
+    name:    'Nairobi Campus',
+    address: 'Nairobi',
+    hours:   'Mon–Fri: 8:00am – 5:00pm',
+    mapUrl:  'https://maps.google.com/?q=Zetech+University+Nairobi',
+    badge:   null,
+  },
+  {
+    name:    'Mangu Campus',
+    address: 'Mangu, Thika',
+    hours:   'Mon–Fri: 8:00am – 5:00pm',
+    mapUrl:  'https://maps.google.com/?q=Zetech+University+Witeithie',
+    badge:   null,
+  },
+]
 
+function CopyButton({ value }) {
+  const [copied, setCopied] = useState(false)
+  const copy = () => {
+    navigator.clipboard.writeText(value)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <button onClick={copy}
+      className="p-1.5 rounded-lg hover:bg-white/20 text-slate-400 hover:text-white transition-all flex-shrink-0"
+      title="Copy">
+      {copied ? <CheckCheck size={13} className="text-green-400" /> : <Copy size={13} />}
+    </button>
+  )
+}
 
-  const departments = [
-    { name: 'Admissions Office', icon: <Users size={20} />, email: 'admissions@zetech.ac.ke' },
-    { name: 'Academic Affairs', icon: <Building2 size={20} />, email: 'academics@zetech.ac.ke' },
-    { name: 'Student Services', icon: <MessageSquare size={20} />, email: 'students@zetech.ac.ke' },
-    { name: 'Finance Office', icon: <Building2 size={20} />, email: 'finance@zetech.ac.ke' }
-  ];
+export default function Contact() {
+  const [contact, setContact] = useState(FALLBACK)
+
+  useEffect(() => {
+    api.get('/university/settings/')
+      .then(res => {
+        const d = res.data?.data ?? res.data
+        if (d?.contact) setContact(prev => ({ ...prev, ...d.contact }))
+      })
+      .catch(() => {})
+  }, [])
+
+  const phone    = contact.phone_primary    || FALLBACK.phone_primary
+  const phone2   = contact.phone_secondary  || FALLBACK.phone_secondary
+  const emailG   = contact.email_general    || FALLBACK.email_general
+  const emailAdm = contact.email_admissions || FALLBACK.email_admissions
+  const emailSup = contact.email_support    || FALLBACK.email_support
+  const address  = contact.address          || FALLBACK.address
+  const waNumber = (contact.whatsapp || FALLBACK.whatsapp).replace(/\D/g, '')
+  const waLink   = `https://wa.me/${waNumber}?text=${encodeURIComponent("Hello! I'd like to get in touch with Zetech University.")}`
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      
-   
+    <div className="min-h-screen bg-white">
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold text-[#1a2b4c] mb-2">Send us a Message</h2>
-              <p className="text-gray-600 mb-6">Fill out the form below and we'll get back to you within 24 hours</p>
+      {/* Hero */}
+      <div className="bg-[#1a2b4c] py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5"
+          style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl" />
+        <div className="max-w-7xl mx-auto relative">
+          <p className="text-orange-400 text-xs font-bold uppercase tracking-widest mb-3">Get In Touch</p>
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-4 max-w-xl leading-tight">
+            We're here<br />to help
+          </h1>
+          <p className="text-slate-400 text-sm max-w-md leading-relaxed">
+            Reach out via phone, email or WhatsApp. Our team is available Monday to Friday, 7:30am – 5:00pm EAT.
+          </p>
+        </div>
+      </div>
 
-              {isSubmitted ? (
-                <div className="bg-green-50 border-2 border-green-500 rounded-lg p-8 text-center">
-                  <CheckCircle size={64} className="mx-auto text-green-500 mb-4" />
-                  <h3 className="text-2xl font-bold text-green-700 mb-2">Message Sent!</h3>
-                  <p className="text-gray-600">Thank you for contacting us. We'll respond shortly.</p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input 
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        placeholder="Walter White"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input 
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200"
-                        placeholder="student@gmail.com"
-                      />
-                    </div>
-                  </div>
+      {/* Primary contact cards */}
+      <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input 
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                        placeholder="+254 700 000 000"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Subject *
-                      </label>
-                      <select 
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                      >
-                        <option value="">Select a subject</option>
-                        <option value="admissions">Admissions Inquiry</option>
-                        <option value="programs">Program Information</option>
-                        <option value="fees">Fee Structure</option>
-                        <option value="general">General Inquiry</option>
-                        <option value="support">Technical Support</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea 
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows="6"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                      placeholder="Tell us how we can help you..."
-                    ></textarea>
-                  </div>
-
-                  <button 
-                    type="submit"
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <Send size={20} />
-                    Send Message
-                  </button>
-                </form>
-              )}
+          {/* Phone */}
+          <a href={`tel:${phone}`}
+            className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
+              <Phone size={19} className="text-blue-600 group-hover:text-white transition-colors" />
             </div>
-          </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Main Line</p>
+            <p className="font-black text-[#1a2b4c] text-sm">{phone}</p>
+            {phone2 && <p className="text-slate-400 text-xs mt-1">{phone2}</p>}
+          </a>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            
-            {/* Quick Departments */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-[#1a2b4c] mb-4">Quick Contact</h3>
-              <div className="space-y-3">
-                {departments.map((dept, index) => (
-                  <div 
-                    key={index}
-                    className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg hover:bg-orange-50 transition-colors cursor-pointer group"
-                  >
-                    <div className="text-orange-500 group-hover:text-orange-600 mt-1">
-                      {dept.icon}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm text-gray-700">{dept.name}</p>
-                      <p className="text-xs text-gray-500">{dept.email}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Email */}
+          <a href={`mailto:${emailG}`}
+            className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-orange-500 transition-colors">
+              <Mail size={19} className="text-orange-500 group-hover:text-white transition-colors" />
             </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">General Email</p>
+            <p className="font-black text-[#1a2b4c] text-sm break-all">{emailG}</p>
+          </a>
 
-            {/* Map Placeholder */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-[#1a2b4c] mb-4">Find Us</h3>
-              <div className="bg-gray-200 rounded-lg h-48 flex items-center justify-center">
-                <MapPin size={48} className="text-gray-400" />
-              </div>
-              <button className="w-full mt-4 bg-[#1a2b4c] hover:bg-[#2d4263] text-white py-3 rounded-lg font-semibold transition-colors">
-                Get Directions
-              </button>
+          {/* WhatsApp */}
+          <a href={waLink} target="_blank" rel="noopener noreferrer"
+            className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500 transition-colors">
+              <MessageCircle size={19} className="text-green-600 group-hover:text-white transition-colors" />
             </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">WhatsApp</p>
+            <p className="font-black text-[#1a2b4c] text-sm">Chat with us</p>
+            <p className="text-slate-400 text-xs mt-1">Typically replies fast</p>
+          </a>
 
-            {/* Emergency Contact */}
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-              <h3 className="text-xl font-bold mb-2">Need Urgent Help?</h3>
-              <p className="text-sm mb-4 text-orange-100">Our admissions team is available to assist you</p>
-              <a 
-                href="tel:+254709912000"
-                className="block bg-white text-orange-600 py-3 rounded-lg font-bold text-center hover:bg-orange-50 transition-colors"
-              >
-                Call +254 709 912 000
-              </a>
+          {/* Location */}
+          <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
+            <div className="w-11 h-11 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+              <MapPin size={19} className="text-purple-600" />
             </div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Main Campus</p>
+            <p className="font-black text-[#1a2b4c] text-sm leading-snug">{address}</p>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
 
-export default Contact;
+      {/* Departments */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-10">
+            <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Departments</p>
+            <h2 className="text-3xl font-black text-[#1a2b4c]">Reach the right team</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {DEPARTMENTS.map(({ name, icon: Icon, email, desc }) => (
+              <a key={name} href={`mailto:${email}`}
+                className="group flex items-start gap-4 p-6 bg-slate-50 hover:bg-white border border-slate-100 hover:border-orange-200 hover:shadow-md rounded-2xl transition-all">
+                <div className="w-10 h-10 bg-white group-hover:bg-orange-50 border border-slate-200 group-hover:border-orange-200 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors shadow-sm">
+                  <Icon size={17} className="text-orange-500" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black text-[#1a2b4c] text-sm mb-0.5">{name}</p>
+                  <p className="text-slate-500 text-xs mb-2 leading-relaxed">{desc}</p>
+                  <p className="text-orange-500 text-xs font-bold truncate">{email}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Campuses */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="mb-10">
+            <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Locations</p>
+            <h2 className="text-3xl font-black text-[#1a2b4c]">Find a campus</h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {CAMPUSES.map(({ name, address, hours, mapUrl, badge }) => (
+              <div key={name} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                {/* Map embed area */}
+                <div className="h-36 bg-gradient-to-br from-[#1a2b4c] to-[#2d4263] relative flex items-center justify-center">
+                  <MapPin size={32} className="text-orange-400 opacity-60" />
+                  {badge && (
+                    <span className="absolute top-3 right-3 bg-orange-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full">
+                      {badge}
+                    </span>
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="font-black text-[#1a2b4c] text-sm mb-1">{name}</h3>
+                  <div className="flex items-start gap-2 text-slate-500 text-xs mb-1">
+                    <MapPin size={11} className="mt-0.5 flex-shrink-0 text-slate-400" />
+                    {address}
+                  </div>
+                  <div className="flex items-start gap-2 text-slate-500 text-xs mb-4">
+                    <Clock size={11} className="mt-0.5 flex-shrink-0 text-slate-400" />
+                    {hours}
+                  </div>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-orange-500 hover:text-orange-600 text-xs font-bold transition-colors">
+                    Get Directions <ExternalLink size={11} />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick contact details strip */}
+      <section className="bg-[#1a2b4c] py-14">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {/* Admissions email */}
+            <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Admissions Email</p>
+                <p className="text-white font-bold text-sm">{emailAdm}</p>
+              </div>
+              <CopyButton value={emailAdm} />
+            </div>
+
+            {/* Support email */}
+            <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">IT / Support Email</p>
+                <p className="text-white font-bold text-sm">{emailSup}</p>
+              </div>
+              <CopyButton value={emailSup} />
+            </div>
+
+            {/* Hours */}
+            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-5 py-4">
+              <Clock size={18} className="text-orange-400 flex-shrink-0" />
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Office Hours</p>
+                <p className="text-white font-bold text-sm">Mon – Fri, 7:30am – 5:00pm EAT</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 bg-white text-center">
+        <p className="text-xs font-bold text-orange-500 uppercase tracking-widest mb-2">Still unsure?</p>
+        <h2 className="text-3xl font-black text-[#1a2b4c] mb-3">Try our AI assistant</h2>
+        <p className="text-slate-500 text-sm mb-8 max-w-sm mx-auto">
+          Ask about programmes, fees, admissions or campus life — instant answers, anytime
+        </p>
+        <a href="/"
+          className="inline-flex items-center gap-2 bg-[#1a2b4c] hover:bg-[#243660] text-white px-8 py-4 rounded-xl font-black text-sm transition-all shadow-lg hover:-translate-y-0.5">
+          <MessageCircle size={15} /> Chat with the AI <ArrowRight size={15} />
+        </a>
+      </section>
+    </div>
+  )
+}

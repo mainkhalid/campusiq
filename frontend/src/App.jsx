@@ -28,6 +28,7 @@ import AdmissionsAdmin from './pages/admin/AdmissionsAdmin'
 import ResearchAdmin from './pages/admin/ResearchAdmin'
 import NewsAdmin from './pages/admin/NewsAdmin'
 import AIAdmin from './pages/admin/AIAdmin'
+import Settings from './pages/admin/Settings'
 import Login from './pages/admin/Login'
 
 function ProtectedRoute({ children }) {
@@ -133,7 +134,7 @@ function AppRoutes() {
         <Route path="research" element={<ResearchAdmin />} />
         <Route path="news" element={<NewsAdmin />} />
         <Route path="settings" element={<AIAdmin />} />
-        
+        <Route path="system-settings" element={<Settings />} />
       </Route>
 
       {/* 404 */}

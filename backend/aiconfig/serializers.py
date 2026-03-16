@@ -1,11 +1,5 @@
 from rest_framework import serializers
-from .models import ChatLog, AISettings
-
-
-class ChatLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model  = ChatLog
-        fields = '__all__'
+from .models import AISettings
 
 
 class AISettingsSerializer(serializers.ModelSerializer):

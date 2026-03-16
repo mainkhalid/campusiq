@@ -12,4 +12,5 @@ urlpatterns = [
     path('news/', include('news.urls')),
     path('aiconfig/', include('aiconfig.urls')),
     path('crawler/', include('crawler.urls')),
+    path('settings/', include('settings_app.urls')),
 ]

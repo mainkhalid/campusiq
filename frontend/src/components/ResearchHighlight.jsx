@@ -1,146 +1,181 @@
-import React from 'react';
-import { Beaker, Cpu, Zap, ArrowUpRight, ShieldCheck, Atom, Microscope, Binary } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react'
+import { ArrowUpRight, RefreshCw, FlaskConical } from 'lucide-react'
+import api from '../api/axios'
+import { Link } from 'react-router-dom'
 
-const ResearchHighlight = () => {
-  const researchPillars = [
-    {
-      icon: <ShieldCheck size={20} />,
-      title: "Error Mitigation",
-      desc: "Developing protocols for the real-time detection and removal of decoherence-induced errors.",
-      tag: "Stability"
-    },
-    {
-      icon: <Zap size={20} />,
-      title: "Photonic Transport",
-      desc: "Utilizing laser-light architecture to carry quantum information across modular networks.",
-      tag: "Speed"
-    },
-    {
-      icon: <Cpu size={20} />,
-      title: "Calculation Fidelity",
-      desc: "Systematically improving the accuracy of algorithmic calculations for complex systems.",
-      tag: "Precision"
+const FALLBACK = [
+  { title: 'Technology & Innovation',     desc: 'Applied research in software engineering, AI systems and digital transformation for East African industries.', department: 'Tech',     status: 'Active'    },
+  { title: 'Business & Entrepreneurship', desc: 'Studies in SME growth, fintech adoption and youth entrepreneurship across Kenya and the region.',              department: 'Sciences', status: 'Active'    },
+  { title: 'Health Sciences Research',    desc: 'Community health studies, nursing practice improvements and public health interventions.',                     department: 'Health',   status: 'Active'    },
+  { title: 'Education & Pedagogy',        desc: 'Research into blended learning, TVET effectiveness and curriculum development at tertiary level.',             department: 'Arts',     status: 'Planning'  },
+]
+
+// Department → colour scheme
+const DEPT_STYLE = {
+  Tech:     { pill: 'bg-blue-50 text-blue-700 border-blue-100',     dot: 'bg-blue-500'     },
+  Health:   { pill: 'bg-emerald-50 text-emerald-700 border-emerald-100', dot: 'bg-emerald-500' },
+  Arts:     { pill: 'bg-purple-50 text-purple-700 border-purple-100',   dot: 'bg-purple-500'   },
+  Sciences: { pill: 'bg-orange-50 text-orange-700 border-orange-100',   dot: 'bg-orange-500'   },
+}
+const DEFAULT_STYLE = { pill: 'bg-slate-100 text-slate-600 border-slate-200', dot: 'bg-slate-400' }
+
+// Status → badge colour
+const STATUS_STYLE = {
+  'Active':      'bg-green-50 text-green-700 border-green-100',
+  'Completed':   'bg-slate-100 text-slate-500 border-slate-200',
+  'Peer Review': 'bg-amber-50 text-amber-700 border-amber-100',
+  'Planning':    'bg-sky-50 text-sky-700 border-sky-100',
+}
+
+function useResearchContent() {
+  const [pillars, setPillars] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [source, setSource]   = useState(null)
+  const fetched = useRef(false)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res  = await api.get('/aiconfig/content/research/')
+      const data = res.data?.data?.pillars
+      setPillars(Array.isArray(data) && data.length >= 2 ? data : null)
+      setSource(res.data?.source || null)
+    } catch {
+      setPillars(null)
+    } finally {
+      setLoading(false)
     }
-  ];
+  }
+
+  useEffect(() => {
+    if (!fetched.current) { fetched.current = true; load() }
+  }, [])
+
+  return { pillars, loading, source, reload: load }
+}
+
+export default function ResearchHighlight() {
+  const { pillars, loading, source, reload } = useResearchContent()
+  const displayed = pillars || FALLBACK
 
   return (
-    <div className="relative bg-[#F8FAFC] overflow-hidden border-y border-slate-200 py-24 px-6">
-      {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-           style={{ backgroundImage: `radial-gradient(#1a2b4c 1px, transparent 1px)`, backgroundSize: '32px 32px' }}>
-      </div>
+    <div className="bg-[#F8FAFC] border-y border-slate-200 py-24 px-6 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.035] pointer-events-none"
+        style={{ backgroundImage: 'radial-gradient(#1a2b4c 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10">
-        
-        {/* Left Side: Abstract Content (5 Columns) */}
-        <div className="lg:col-span-5 space-y-10">
+      <div className="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-12 gap-16 items-start">
+
+        {/* Left */}
+        <div className="lg:col-span-5 space-y-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-orange-100 shadow-sm rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-orange-100 shadow-sm rounded-full mb-5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
               </span>
-              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                Pioneering Quantum Faculty
-              </span>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Research</span>
             </div>
-            
-            <h2 className="text-4xl md:text-5xl font-black text-[#1a2b4c] leading-[1.1] mb-6 tracking-tight">
-              Advancing the <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">Computational Frontier</span>
+            <h2 className="text-4xl md:text-5xl font-black text-[#1a2b4c] leading-[1.1] mb-5 tracking-tight">
+              Research &<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-orange-400">
+                Innovation
+              </span>
             </h2>
-            
-            <p className="text-slate-600 leading-relaxed text-lg">
-              Our researchers are spearheading breakthroughs in quantum mechanics that 
-              promise to redefine global computational limits. We are transitioning theory 
-              into scalable, functional technology for the 2026 digital era.
+            <p className="text-slate-600 leading-relaxed">
+              Zetech University drives applied research that addresses real challenges in technology,
+              health, business and education across Kenya and East Africa.
             </p>
           </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4">
-             {[
-               { label: 'Fidelity', value: '99.9%', icon: <Atom size={14}/> },
-               { label: 'Patents', value: '12+', icon: <Binary size={14}/> },
-               { label: 'Scale Goal', value: '2026', icon: <Microscope size={14}/> }
-             ].map((stat, i) => (
-               <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:border-orange-200 transition-colors group">
-                  <div className="text-orange-500 mb-2 group-hover:scale-110 transition-transform">{stat.icon}</div>
-                  <p className="text-xl font-black text-[#1a2b4c]">{stat.value}</p>
-                  <p className="text-[10px] text-slate-400 uppercase font-black tracking-wider">{stat.label}</p>
-               </div>
-             ))}
-          </div>
-
-          <div className="pt-4">
-            <button className="inline-flex items-center gap-4 bg-[#1a2b4c] text-white px-8 py-4 rounded-full font-bold hover:bg-orange-600 transition-all group shadow-lg shadow-[#1a2b4c]/10">
-              Explore the Lab Repository 
-              <ArrowUpRight size={20} className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
+          <Link to="/research"
+            className="inline-flex items-center gap-3 bg-[#1a2b4c] text-white px-7 py-4 rounded-full font-bold hover:bg-orange-600 transition-all group shadow-lg shadow-[#1a2b4c]/10 text-sm">
+            Explore Research & Scholarships
+            <ArrowUpRight size={18} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
         </div>
 
-        {/* Right Side: Technical Breakdown (7 Columns) */}
+        {/* Right — project cards */}
         <div className="lg:col-span-7">
-          <div className="bg-[#1a2b4c] p-1 md:p-2 rounded-[2.5rem] shadow-2xl shadow-[#1a2b4c]/20">
-            <div className="bg-white rounded-[2rem] p-8 md:p-12 relative overflow-hidden">
-              {/* Decorative "Quantum" background element */}
-              <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-50 rounded-full blur-3xl opacity-60"></div>
-              
-              <div className="flex justify-between items-start mb-12">
-                <div>
-                  <h3 className="text-2xl font-black text-[#1a2b4c]">Ongoing Research</h3>
-                  <p className="text-slate-400 text-sm font-medium">Strategic Tech-Focus Areas</p>
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden">
+
+            {/* Panel header */}
+            <div className="px-8 py-5 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center">
+                  <FlaskConical size={16} className="text-orange-500" />
                 </div>
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-inner">
-                  <Beaker className="text-orange-500" size={28} />
+                <div>
+                  <p className="font-black text-[#1a2b4c] text-sm">Research Projects</p>
+                  <p className="text-[10px] text-slate-400">
+                    {source === 'cache' ? 'From research database · cached' : 'From research database'}
+                  </p>
                 </div>
               </div>
-              
-              <div className="space-y-4">
-                {researchPillars.map((pillar, idx) => (
-                  <div key={idx} className="group relative flex gap-6 p-6 rounded-2xl border border-transparent hover:border-slate-100 hover:bg-slate-50/50 transition-all duration-300">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-slate-100 text-[#1a2b4c] group-hover:bg-orange-500 group-hover:text-white flex items-center justify-center transition-all duration-300 shadow-sm">
-                      {pillar.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="font-black text-[#1a2b4c] text-sm uppercase tracking-wider">
-                          {pillar.title}
-                        </h4>
-                        <span className="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-0.5 rounded uppercase tracking-tighter">
-                          {pillar.tag}
-                        </span>
-                      </div>
-                      <p className="text-slate-500 text-sm leading-relaxed max-w-md">
-                        {pillar.desc}
-                      </p>
+              <button onClick={reload} disabled={loading}
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors disabled:opacity-40">
+                <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+              </button>
+            </div>
+
+            {/* Project rows */}
+            <div className="divide-y divide-slate-50">
+              {loading ? (
+                [1,2,3,4].map(i => (
+                  <div key={i} className="p-5 flex gap-4 items-start">
+                    <div className="w-2 h-2 rounded-full bg-slate-100 mt-2 flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 bg-slate-100 rounded animate-pulse w-3/4" />
+                      <div className="h-3 bg-slate-50 rounded animate-pulse w-full" />
+                      <div className="h-3 bg-slate-50 rounded animate-pulse w-1/2" />
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                displayed.map((p, i) => {
+                  const dept   = DEPT_STYLE[p.department]   || DEFAULT_STYLE
+                  const status = STATUS_STYLE[p.status]      || STATUS_STYLE['Planning']
+                  return (
+                    <div key={i}
+                      className="flex gap-4 items-start px-6 py-5 hover:bg-slate-50/60 transition-colors group">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-2 ${dept.dot}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          {p.department && (
+                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase ${dept.pill}`}>
+                              {p.department}
+                            </span>
+                          )}
+                          {p.status && (
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${status}`}>
+                              {p.status}
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-black text-[#1a2b4c] text-sm leading-snug mb-1">
+                          {p.title}
+                        </p>
+                        {p.desc && (
+                          <p className="text-slate-500 text-xs leading-relaxed line-clamp-2">
+                            {p.desc}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
 
-              {/* Impact Quote Card */}
-              <div className="mt-10 p-6 bg-gradient-to-br from-[#1a2b4c] to-[#2a457a] rounded-2xl text-white relative shadow-xl">
-                <div className="absolute top-4 right-6 opacity-20">
-                  <Cpu size={40} />
-                </div>
-                <p className="text-[10px] font-black text-orange-400 uppercase mb-3 tracking-[0.2em]">Socio-Economic Impact</p>
-                <p className="text-sm md:text-base leading-relaxed font-medium italic opacity-95">
-                  "This architecture enables the rapid design of life-saving drugs and optimized global commerce architectures, effectively shrinking time-to-market for complex solutions."
-                </p>
-                <div className="mt-4 pt-4 border-t border-white/10 flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-bold">DR</div>
-                   <span className="text-xs font-bold text-slate-300">Head of Quantum Labs, Zetech University</span>
-                </div>
-              </div>
+            {/* Footer CTA */}
+            <div className="mx-6 mb-6 mt-2 p-5 bg-gradient-to-br from-[#1a2b4c] to-[#2a457a] rounded-2xl text-white">
+              <p className="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-2">Commitment</p>
+              <p className="text-sm leading-relaxed text-slate-200 italic">
+                "Our research bridges academic knowledge and practical impact — preparing graduates who don't just understand the world, but change it."
+              </p>
             </div>
           </div>
         </div>
-
       </div>
     </div>
-  );
-};
-
-export default ResearchHighlight;
+  )
+}

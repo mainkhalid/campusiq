@@ -1,75 +1,64 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 
 
-class ChatLog(models.Model):
-    """
-    One row per student message. No personal data, no full conversation.
-    Just enough for the admin to see what topics students ask about
-    and whether the bot was able to help.
-    """
-    TOPIC_CHOICES = [
-        ('programmes',   'Programmes'),
-        ('timetable',    'Timetable'),
-        ('admissions',   'Admissions'),
-        ('fees',         'Fees'),
-        ('scholarships', 'Scholarships'),
-        ('research',     'Research'),
-        ('general',      'General'),
-        ('unknown',      'Unknown'),
-    ]
-
-    topic                 = models.CharField(max_length=20, choices=TOPIC_CHOICES, default='unknown', db_index=True)
-    message               = models.TextField()           # student question, capped at 500 chars in service
-    response              = models.TextField(blank=True)  # bot reply preview, capped at 800 chars
-    was_helpful           = models.BooleanField(default=False)
-    had_timetable_results = models.BooleanField(default=False)
-    had_programme_results = models.BooleanField(default=False)
-    created_at            = models.DateTimeField(auto_now_add=True, db_index=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"[{self.topic}] {self.message[:60]}"
 
 
 class AISettings(models.Model):
-    """
-    Singleton — only one row, pk=1.
-    Admin edits via AIAdmin panel → service reads on every request.
-    Changes take effect on the very next student message.
-    """
-    # Data source toggles — bot skips the DB query if disabled
-    use_programmes   = models.BooleanField(default=True)
-    use_faqs         = models.BooleanField(default=True)
-    use_timetable    = models.BooleanField(default=True)
-    use_research     = models.BooleanField(default=True)
-    use_scholarships = models.BooleanField(default=True)
+    use_programmes       = models.BooleanField(default=True)
+    use_faqs             = models.BooleanField(default=True)
+    use_timetable        = models.BooleanField(default=True)
+    use_research         = models.BooleanField(default=True)
+    use_scholarships     = models.BooleanField(default=True)
     use_external_sources = models.BooleanField(default=True)
-
-    # First message the widget shows when a student opens the chat
-    greeting_message = models.TextField(
+    fast_model           = models.CharField(max_length=255, default='arcee-ai/trinity-mini:free')
+    smart_model          = models.CharField(max_length=255, default='arcee-ai/trinity-large-preview:free')
+    greeting_message     = models.TextField(
         default="Hello! 👋 I'm your Zetech University assistant. How can I help you today?"
     )
-
-    # Admin extra instructions injected at the top of the system prompt.
-    # Examples: "Always respond in English and Swahili"
-    #           "Promote ICT school when relevant"
-    #           "Do not discuss competitor universities"
-    custom_system_prompt = models.TextField(blank=True)
-
-    # Controls creativity vs accuracy of LLM responses
-    temperature = models.FloatField(default=0.7)
-
-    updated_at = models.DateTimeField(auto_now=True)
+    custom_system_prompt = models.TextField(blank=True, default='')
+    temperature          = models.FloatField(default=0.7)
+    updated_at           = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = 'AI Settings'
-
-    def __str__(self):
-        return f"AI Settings (updated {self.updated_at.strftime('%Y-%m-%d')})"
+        verbose_name        = 'AI Settings'
+        verbose_name_plural = 'AI Settings'
 
     @classmethod
     def get_settings(cls):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+    def __str__(self):
+        return 'AI Settings'
+
+
+# ── Added: counter-only analytics, replaces ChatLog writes ───
+
+TOPIC_CHOICES = [
+    ('programmes',   'Programmes'),
+    ('fees',         'Fees'),
+    ('timetable',    'Timetable'),
+    ('scholarships', 'Scholarships'),
+    ('admissions',   'Admissions'),
+    ('research',     'Research'),
+    ('general',      'General'),
+]
+
+
+class DailyStat(models.Model):
+    """
+    One row per topic per day — just a counter.
+    No messages, no personal data stored.
+    """
+    date  = models.DateField(default=timezone.now)
+    topic = models.CharField(max_length=50, choices=TOPIC_CHOICES)
+    total = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('date', 'topic')
+        ordering        = ['-date', 'topic']
+
+    def __str__(self):
+        return f"{self.date} | {self.topic}: {self.total}"
