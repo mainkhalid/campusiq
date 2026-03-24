@@ -21,7 +21,6 @@ const AcademicsPage = () => {
   const [loading, setLoading]             = useState(true)
   const [error, setError]                 = useState(null)
 
-  // Re-apply level filter if URL param changes (e.g. navbar click)
   useEffect(() => {
     const lvl = searchParams.get('level') || ''
     setActiveLevel(lvl)

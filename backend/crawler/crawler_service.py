@@ -142,10 +142,6 @@ def chunk_text(text: str, source_meta: dict = None) -> list[dict]:
         return {'content': content.strip(), 'chunk_index': index, **(source_meta or {})}
 
     sentences = re.split(r'(?<=[.!?])\s+', text)
-
-    # Fee tables / dense data pages produce very few sentences.
-    # If fewer than 3 sentence breaks found, use word-boundary splitting
-    # so we never slice through the middle of a number like '54,'.
     if len(sentences) <= 3:
         words = text.split()
         chunks, current_words, index = [], [], 0
@@ -304,9 +300,6 @@ def crawl_website(source) -> tuple[int, str]:
 
     return saved, ''
 
-
-# ── PDF extractor ─────────────────────────────────────────
-
 def extract_pdf(source) -> tuple[int, str]:
     """
     Extract text from an uploaded PDF, chunk it, embed each chunk, save to DB.
@@ -386,8 +379,6 @@ def search_chunks(query: str, top_k: int = TOP_K) -> list[str]:
     query_embedding = get_embedding(query)
     if not query_embedding:
         return []
-
-    # Load only active source chunks that have embeddings
     chunks = CrawlChunk.objects.filter(
         source__active=True,
         source__status='indexed',

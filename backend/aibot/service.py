@@ -300,7 +300,6 @@ class AIBotService:
             print(f'News fetch error: {e}')
             return []
 
-    # ── 4. External chunks ────────────────────────────────────────────────────
     def get_external_chunks(self, query, intent, settings):
         if not getattr(settings, 'use_external_sources', False):
             return []
@@ -488,7 +487,6 @@ BEHAVIOUR RULES
         """
         request: optional DRF/Django request — used for rate limiting by IP.
         """
-        # ── System-level checks (maintenance, security) ───────────────────────
         try:
             from settings_app.views import get_system_settings
             sys = get_system_settings()
@@ -511,7 +509,7 @@ BEHAVIOUR RULES
                 }
 
         except Exception:
-            pass  # settings_app not installed — continue with defaults
+            pass  
 
         if conversation is not None:
             db_messages = conversation.messages.order_by('created_at')
@@ -519,7 +517,6 @@ BEHAVIOUR RULES
         else:
             history = []
 
-        # ── Conversation turn cap — sliding window ────────────────────────────
         try:
             from settings_app.views import get_system_settings
             sys = get_system_settings()
@@ -572,8 +569,6 @@ BEHAVIOUR RULES
             if intent['is_news_query'] and news:
                 news_text = '\n\n'.join(self.format_news_article(a) for a in news)
                 if external_chunks:
-                    # Query touches both news and chunk-only topics (e.g. graduation,
-                    # hostel) — merge both sources so the bot can answer fully.
                     chunks_text = '\n\n'.join(external_chunks)
                     enhanced_message = (
                         f"Use the following information to answer the student's question.\n\n"
@@ -678,7 +673,6 @@ BEHAVIOUR RULES
                 'error':    True,
             }
 
-    # ── 8. Write log ──────────────────────────────────────────────────────────
     def _write_log(self, intent):
         try:
             from aiconfig.models import DailyStat
@@ -707,7 +701,6 @@ BEHAVIOUR RULES
         except Exception as e:
             print(f'DailyStat write error (non-fatal): {e}')
 
-    # ── 9. Timetable helpers ──────────────────────────────────────────────────
     def get_timetable_info(self, settings):
         if not settings.use_timetable:
             return {'available': False, 'timetables': [], 'schools': []}
@@ -795,22 +788,12 @@ BEHAVIOUR RULES
             'academicYear': s.timetable.academic_year,
             'semester':     s.timetable.semester,
         } for s in sessions]
-
-    # ── 10. Quick actions ─────────────────────────────────────────────────────
     def get_quick_actions(self):
-        # All possible actions — source_flag=None means always show.
-        # Actions whose flag is disabled are stripped so the student
-        # never taps a chip that leads to a dead end.
-        #
-        # Read from SystemSettings (authoritative source) rather than
-        # AISettings — the use_* fields may not exist as model fields
-        # on AISettings, causing getattr to always fall back to True.
         sources = {}
         try:
             from settings_app.models import SystemSettings
             sources = SystemSettings.get_settings().get_section('sources')
         except Exception:
-            # settings_app not installed — fall back to AISettings
             s = self._get_settings()
             sources = {
                 'use_programmes':       getattr(s, 'use_programmes',       True),

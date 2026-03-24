@@ -83,13 +83,10 @@ class CrawlSourceViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         source = self.get_object()
-        # Clean up PDF file if it still exists
         source.delete_pdf_file()
-        # Chunks cascade-delete via FK
         source.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # ── POST /crawler/sources/{id}/crawl/ ────────────────────
     @action(detail=True, methods=['post'])
     def crawl(self, request, pk=None):
         """Manually trigger a re-crawl / re-index."""
@@ -109,7 +106,7 @@ class CrawlSourceViewSet(viewsets.ModelViewSet):
             'status': 'crawling',
         })
 
-    # ── PATCH /crawler/sources/{id}/toggle/ ─────────────────
+ 
     @action(detail=True, methods=['patch'])
     def toggle(self, request, pk=None):
         """Toggle active/inactive without affecting chunks."""
@@ -121,7 +118,6 @@ class CrawlSourceViewSet(viewsets.ModelViewSet):
             'detail':  f'Source {"activated" if source.active else "deactivated"}.',
         })
 
-    # ── GET /crawler/sources/{id}/chunks/ ───────────────────
     @action(detail=True, methods=['get'])
     def chunks(self, request, pk=None):
         """Preview first 10 chunks — useful for debugging."""

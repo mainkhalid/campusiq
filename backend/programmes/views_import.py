@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from bs4 import BeautifulSoup
 
 
-# ── URLs ──────────────────────────────────────────────────
+
 FEES_URL   = 'https://www.zetech.ac.ke/index.php/academics/tuition-fees'
 SAJILI_URL = 'https://sajili.zetech.ac.ke/index.php?mod=programs'
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; ZetechBot/1.0)'}
 
-# ── Level detection ───────────────────────────────────────
+
 SECTION_LEVEL_MAP = {
     'phd programmes':      'Doctorate',
     'master programmes':   'Masters',
@@ -20,15 +20,12 @@ SECTION_LEVEL_MAP = {
     'diploma courses':     'Diploma',
     'certificate courses': 'Certificate',
     'tvet courses':        'Certificate',
-    # sajili headings
     'doctorate':           'Doctorate',
     'masters':             'Masters',
     'degree':              'Degree',
     'diploma':             'Diploma',
     'certificate':         'Certificate',
 }
-
-# ── School inference ──────────────────────────────────────
 SCHOOL_MAP = [
     (['computer science', 'software', 'information technology', ' it ', 'ict',
       'networks', 'media', 'digital', 'engineering', 'actuarial', 'data science',
@@ -71,9 +68,6 @@ def normalize_name(name: str) -> str:
     name = re.sub(r'\s*\([^)]+\)\s*', ' ', name)
     name = re.sub(r'\s+', ' ', name).strip().upper()
     return name
-
-
-# ── Scraper 1: Fees page ──────────────────────────────────
 
 def scrape_fees_page() -> dict:
     """
@@ -131,8 +125,6 @@ def scrape_fees_page() -> dict:
     return result
 
 
-# ── Scraper 2: Sajili programmes page ─────────────────────
-
 def scrape_sajili_page() -> list[dict]:
     """
     Scrape sajili programmes page.
@@ -155,8 +147,6 @@ def scrape_sajili_page() -> list[dict]:
                     current_level = level
                     break
             continue
-
-        # Programme anchor — each programme is an <a href="#ID">
         href = element.get('href', '')
         if not href.startswith('#') or not href[1:].isdigit():
             continue

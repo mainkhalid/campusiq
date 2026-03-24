@@ -20,15 +20,10 @@ class ProgrammeViewSet(viewsets.ModelViewSet):
         return Programme.objects.filter(is_active=True)
 
     def get_serializer_class(self):
-        # Use the lightweight serializer for list action,
-        # full serializer for retrieve/create/update.
-        # This is a standard DRF pattern for performance.
         if self.action == 'list':
             return ProgrammeListSerializer
         return ProgrammeSerializer
 
-    # Custom actions replace your special Express routes:
-    # GET /programmes/school/:school → /api/programmes/programmes/by_school/?school=ict
     @action(detail=False, methods=['get'], url_path='by-school')
     def by_school(self, request):
         school = request.query_params.get('school')

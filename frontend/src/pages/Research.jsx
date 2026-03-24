@@ -148,7 +148,6 @@ function ProjectCard({ project, onDetails }) {
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
 const Research = () => {
   const navigate = useNavigate()
   const [projects, setProjects]           = useState([])
@@ -166,12 +165,11 @@ const Research = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  // Research news — pull news articles tagged 'research' from the news DB
+  
   useEffect(() => {
     api.get('/news/posts/?status=published&ordering=-created_at&category=news')
       .then(res => {
         const all = res.data.results ?? res.data.data ?? res.data ?? []
-        // Filter to research-tagged articles
         const research = all.filter(a =>
           Array.isArray(a.tags) && a.tags.some(t =>
             ['research', 'innovation', 'grants', 'technology', 'health research', 'conferences'].includes(t.toLowerCase())
@@ -213,7 +211,7 @@ const Research = () => {
         </div>
       </section>
 
-      {/* Research Projects ─────────────────────────────────────── */}
+      
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-end mb-10 flex-wrap gap-4">
@@ -251,7 +249,7 @@ const Research = () => {
         </div>
       </section>
 
-      {/* Research News ─────────────────────────────────────────── */}
+      {/* Research News*/}
       {(newsLoading || researchNews.length > 0) && (
         <section className="py-20 bg-white">
           <div className="max-w-7xl mx-auto px-4">
@@ -283,7 +281,7 @@ const Research = () => {
         </section>
       )}
 
-      {/* Scholarships ──────────────────────────────────────────── */}
+      {/* Scholarships */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">

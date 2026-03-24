@@ -18,7 +18,6 @@ export default function FAQ() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Derive categories from data
   const categories = useMemo(() => {
     const cats = ['All', ...new Set(faqs.map(f => f.category).filter(Boolean))]
     return cats

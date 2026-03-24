@@ -186,7 +186,6 @@ export default function Contact() {
           <div className="grid sm:grid-cols-3 gap-5">
             {CAMPUSES.map(({ name, address, hours, mapUrl, badge }) => (
               <div key={name} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                {/* Map embed area */}
                 <div className="h-36 bg-gradient-to-br from-[#1a2b4c] to-[#2d4263] relative flex items-center justify-center">
                   <MapPin size={32} className="text-orange-400 opacity-60" />
                   {badge && (
@@ -215,8 +214,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-
-      {/* Quick contact details strip */}
       <section className="bg-[#1a2b4c] py-14">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

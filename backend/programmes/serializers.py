@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Programme
 
 class ProgrammeSerializer(serializers.ModelSerializer):
-    # Expose computed properties as read-only fields
     total_programme_cost = serializers.ReadOnlyField()
     total_credits = serializers.ReadOnlyField()
 

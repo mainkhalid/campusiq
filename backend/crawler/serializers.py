@@ -10,7 +10,6 @@ class CrawlChunkSerializer(serializers.ModelSerializer):
 
 class CrawlSourceSerializer(serializers.ModelSerializer):
     chunk_count  = serializers.IntegerField(read_only=True)
-    # Don't expose the embedding vectors in the list — too large
     class Meta:
         model  = CrawlSource
         fields = [

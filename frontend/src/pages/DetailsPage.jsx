@@ -71,8 +71,6 @@ const DetailsPage = ({ type }) => {
 
   const isResearch = type === 'research'
 
-  // Determine if this project has rich data (manually added) or is thin (scraped)
-  // A project is "thin" if it has no abstract or the abstract is the raw list item text
   const hasRichData = isResearch
     ? (data.abstract && data.abstract.length > 80 && data.milestones?.length > 0)
     : true

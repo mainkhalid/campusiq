@@ -34,10 +34,6 @@ class ResearchProject(models.Model):
         blank=True, default=list
     )
 
-    # JSONField instead of ImageField — stores Cloudinary response dict:
-    # { url, public_id, width, height, format, bytes }
-    # Matches exactly the shape returned by upload_to_cloudinary()
-    # and mirrors your Node thumbnail: { url, publicId, ... } structure.
     thumbnail = models.JSONField(default=dict, blank=True)
 
     created_by = models.ForeignKey(

@@ -20,13 +20,11 @@ class ResearchProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = ResearchProject
-        fields = '__all__'  # includes thumbnail since it's on the model
+        fields = '__all__'  
 
 
 class ResearchProjectListSerializer(serializers.ModelSerializer):
     thumbnail_url = serializers.SerializerMethodField()
-    # ✅ No thumbnail field declaration here — not in fields list so don't declare it
-    # thumbnail_url is all we need for list views
 
     def get_thumbnail_url(self, obj):
         if obj.thumbnail and isinstance(obj.thumbnail, dict):

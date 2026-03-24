@@ -1,18 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// StudentLife.jsx — SectionBlock updated to use GET /content/student-life/
-//
-// Previously: each of the 4 SectionBlock components mounted and fired
-//             POST /aibot/chat/ independently → 4 LLM calls per page visit.
-//
-// Now:        a single useStudentLifeContent() hook fetches all 4 sections
-//             in one GET request from the server-side cache → 0 LLM calls.
-//             The hook is called at the StudentLife page level and the result
-//             is passed down as props — so only one request fires total.
-//
-// The StudentLifeAsk section at the bottom is UNCHANGED — it's a genuine
-// interactive question box and should continue using /aibot/chat/.
-// ─────────────────────────────────────────────────────────────────────────────
-
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import {
   Heart, Users, Trophy, BookOpen,
@@ -106,7 +91,6 @@ function useStudentLifeContent() {
   return { content, loading, source, reload: load }
 }
 
-// ── Section card — receives items as prop, no internal fetch ─────────────────
 function SectionBlock({ section, items, loading, isLive, onReload }) {
   const Icon      = section.icon
   const displayed = (items && items.length >= 2) ? items : section.fallback
@@ -125,7 +109,6 @@ function SectionBlock({ section, items, loading, isLive, onReload }) {
             </span>
           )}
         </div>
-        {/* Reload only makes sense on the page level — button wired to parent reload */}
         <button onClick={onReload} disabled={loading}
           className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 transition-colors disabled:opacity-50">
           <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
@@ -164,7 +147,6 @@ function SectionBlock({ section, items, loading, isLive, onReload }) {
   )
 }
 
-// ── StudentLifeAsk — UNCHANGED, uses /aibot/chat/ correctly ──────────────────
 function StudentLifeAsk() {
   const [q, setQ]           = useState('')
   const [answer, setAnswer] = useState('')

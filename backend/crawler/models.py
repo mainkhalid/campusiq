@@ -24,11 +24,10 @@ class CrawlSource(models.Model):
 
     # Website / sitemap fields
     url          = models.URLField(blank=True, default='')
-    crawl_depth  = models.IntegerField(default=1)          # how many link levels to follow
+    crawl_depth  = models.IntegerField(default=1)         
 
-    # PDF fields — store file path only, we delete after extraction
     pdf_file     = models.FileField(upload_to='crawler_pdfs/', blank=True, null=True)
-    pdf_filename = models.CharField(max_length=255, blank=True) # original filename for display
+    pdf_filename = models.CharField(max_length=255, blank=True) 
 
     # State
     active        = models.BooleanField(default=True)
@@ -69,11 +68,11 @@ class CrawlChunk(models.Model):
     source    = models.ForeignKey(
         CrawlSource, on_delete=models.CASCADE, related_name='chunks'
     )
-    content   = models.TextField()                  # raw extracted text chunk
-    page_url  = models.URLField(blank=True)         # which page/section it came from
+    content   = models.TextField()                  
+    page_url  = models.URLField(blank=True)         
     page_title = models.CharField(max_length=500, blank=True)
-    embedding = models.JSONField(default=list)      # float list from embedding model
-    metadata  = models.JSONField(default=dict)      # chunk_index, page_num, section, etc.
+    embedding = models.JSONField(default=list)      
+    metadata  = models.JSONField(default=dict)     
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

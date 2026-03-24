@@ -3,16 +3,29 @@
 An AI-powered chatbot for universities built with Django and React. Answers student questions about programmes, fees, timetables, scholarships, and more — using RAG (Retrieval-Augmented Generation) with both internal database knowledge and externally crawled website content.
 
 ---
-
-## Features
-
-- 🤖 **AI Chat Widget** — embeddable floating chat widget for any university website
-- 🎓 **Programme Search** — answers questions about courses, entry requirements, and fees
-- 📅 **Timetable Lookup** — finds class schedules by unit code, lecturer, or room
-- 🌐 **External Knowledge Base** — crawls university website pages and indexes PDFs
-- 📊 **Admin Panel** — manage content, crawl sources, view chat logs, and configure AI behaviour
-- 🔍 **RAG Search** — cosine similarity search over embedded chunks for accurate answers
-- ⚙️ **Dual Model Strategy** — lightweight model for simple queries, precise model for data-heavy responses
+### Student-Facing
+- **AI Chat Widget** — floating chat widget with typing indicators, topic tracking, and WhatsApp fallback
+- **Programme Search** — answers questions about courses, entry requirements, and fees from the database
+- **Timetable Lookup** — finds class schedules by programme group, unit code, lecturer, or room
+-  **RAG Knowledge Base** — crawls university website pages and indexes PDFs for questions the DB doesn't cover
+- **News & Events** — live news feed scraped from the university website with category filtering
+- **AI-Powered Pages** — Admissions, Student Life, and Research pages pull content from the knowledge base
+- **Context-Aware Conversations** — topic tracker maintains context across follow-up questions
+ 
+### Admin Panel
+-  **Analytics Dashboard** — chat volume charts, topic breakdown, daily/weekly stats
+-  **AI Settings** — configure models, temperature, greeting message, data source toggles
+-  **Chat Logs** — browse full conversation transcripts, delete sessions
+-  **Knowledge Sources** — add/crawl websites, upload PDFs, view indexed chunks
+- **Content Management** — programmes, FAQs, scholarships, research projects, timetables, news
+- **News Scraper** — two-step preview-and-confirm import from the university website
+- **Programme Importer** — AI-assisted dual-source scraper for programme catalogue
+ 
+### Architecture
+- ⚡ **Dual Model Strategy** — fast model for simple queries, precise model for data-heavy responses
+- **Hybrid Routing** — structured DB for programmes/fees, semantic search for general knowledge
+-  **Client-Side Prefetch Cache** — `ChunkDataContext` prefetches AI content on app load, zero wait on page visit
+- **JWT Authentication** — access + refresh token rotation for admin routes
 
 ---
 
@@ -123,7 +136,7 @@ Query → embed query → cosine similarity → top 15 chunks → inject into pr
 ```python
 # In crawler/crawler_service.py
 EMBED_BACKEND = 'openrouter'
-EMBED_MODEL   = 'qwen/qwen3-embedding-0.6b'   # ~$0.01/1M tokens
+EMBED_MODEL   = 'qwen/qwen3-embedding-0.6b'   
 ```
 
 ---
@@ -132,8 +145,8 @@ EMBED_MODEL   = 'qwen/qwen3-embedding-0.6b'   # ~$0.01/1M tokens
 
 | Role | Model | Used when |
 |---|---|---|
-| Default | `liquid/lfm-2.5-1.2b-instruct:free` | Greetings, simple queries |
-| Precise | `arcee-ai/trinity-mini:free` | External chunks present |
+| Fast | `arcee-ai/trinity-mini:free` | Greetings, simple queries |
+| Smart | `arcee-ai/trinity-large-preview:free` | External chunks present |
 | Embeddings (dev) | `all-MiniLM-L6-v2` | Local, free, CPU |
 | Embeddings (prod) | `qwen/qwen3-embedding-0.6b` | OpenRouter API |
 

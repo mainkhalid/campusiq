@@ -17,7 +17,7 @@ class NewsPostViewSet(viewsets.ModelViewSet):
     filterset_fields   = ['category', 'status']
     search_fields      = ['title', 'content', 'author']
     ordering_fields    = ['created_at', 'event_date']
-    queryset           = NewsPost.objects.all()  # ✅ required by router
+    queryset           = NewsPost.objects.all() 
 
     def get_queryset(self):
         if self.request.user.is_authenticated:

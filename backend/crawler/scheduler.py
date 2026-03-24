@@ -48,16 +48,13 @@ def start():
     t = threading.Thread(
         target=_loop,
         name='auto-crawl-scheduler',
-        daemon=True,         # dies with the main process
+        daemon=True,        
     )
     t.start()
     logger.info('[Scheduler] Auto-crawl scheduler started')
 
 
-# ── Main loop ─────────────────────────────────────────────────────────────────
-
 def _loop():
-    # Give Django a moment to finish startup before the first tick
     time.sleep(10)
 
     while True:
@@ -73,11 +70,7 @@ def _loop():
             except Exception:
                 pass
 
-        time.sleep(60)   # check every minute
-
-
-# ── Tick ──────────────────────────────────────────────────────────────────────
-
+        time.sleep(60)   
 def _tick():
     """
     Single scheduler tick. Reads settings, decides whether to crawl, fires threads.
@@ -154,7 +147,7 @@ def _select_sources(flags: dict) -> list:
     Return IDs of active, non-busy website sources that match the enabled flags.
 
     Matching logic:
-    - 'main'     → sources whose URL contains zetech.ac.ke but NOT research.zetech
+    - 'main'     → sources whose URL contains zetech.ac.ke 
     - 'research' → sources whose URL contains research.zetech.ac.ke
     - 'news'     → sources whose name contains 'news' (case-insensitive)
                    OR URL contains /news or /events
@@ -196,9 +189,6 @@ def _select_sources(flags: dict) -> list:
 
     return selected
 
-
-# ── Fire crawl threads ────────────────────────────────────────────────────────
-
 def _fire_crawls(source_ids: list):
     from .views import _run_crawl
     for sid in source_ids:
@@ -225,9 +215,6 @@ def _run_research_scraper():
             from django.conf import settings as djsettings
 
             base = getattr(djsettings, 'INTERNAL_API_BASE', 'http://127.0.0.1:8000')
-
-            # We need an auth token — use the scheduler service account if configured,
-            # otherwise skip (structured scrapers require auth)
             token = getattr(djsettings, 'SCHEDULER_API_TOKEN', None)
             if not token:
                 logger.debug('[Scheduler] No SCHEDULER_API_TOKEN — skipping research scraper')

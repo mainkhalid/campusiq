@@ -21,7 +21,6 @@ import AboutZetech from './pages/AboutZetech'
 import AdminDashboard from './layouts/AdminDashboard'
 import Programmes from './pages/admin/Programmes'
 import Dashboard from './pages/admin/Dashboard'
-import History from './pages/admin/History'
 import Faqadmin from './pages/admin/Faqadmin'
 import Scholarships from './pages/admin/Scholarships'
 import AdmissionsAdmin from './pages/admin/AdmissionsAdmin'
@@ -129,7 +128,6 @@ function AppRoutes() {
         <Route path="programmes" element={<Programmes />} />
         <Route path="faqadmin" element={<Faqadmin />} />
         <Route path="scholars" element={<Scholarships />} />
-        <Route path="history" element={<History />} />
         <Route path="admissions" element={<AdmissionsAdmin />} />
         <Route path="research" element={<ResearchAdmin />} />
         <Route path="news" element={<NewsAdmin />} />

@@ -34,8 +34,6 @@ class AISettings(models.Model):
         return 'AI Settings'
 
 
-# ── Added: counter-only analytics, replaces ChatLog writes ───
-
 TOPIC_CHOICES = [
     ('programmes',   'Programmes'),
     ('fees',         'Fees'),

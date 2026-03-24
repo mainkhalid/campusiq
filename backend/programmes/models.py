@@ -30,7 +30,6 @@ class Programme(models.Model):
         ('September', 'September'),
     ]
 
-    # ── Core fields (used by frontend + AI bot) ──────────────
     name = models.CharField(max_length=255, db_index=True)
     code = models.CharField(max_length=20, blank=True, null=True, default=None)
     school = models.CharField(max_length=50, choices=SCHOOL_CHOICES, db_index=True)
@@ -46,11 +45,9 @@ class Programme(models.Model):
     goal = models.TextField(blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
 
-    # ── Duration ─────────────────────────────────────────────
     duration_years = models.PositiveIntegerField(null=True, blank=True)
     duration_semesters = models.PositiveIntegerField(null=True, blank=True)
 
-    # ── Fees ─────────────────────────────────────────────────
     fee_per_semester = models.PositiveIntegerField(null=True, blank=True)
     semesters = models.PositiveIntegerField(null=True, blank=True)
 

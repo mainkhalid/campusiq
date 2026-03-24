@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, BookOpen, GraduationCap, UserCheck,
-  Microscope, MessageSquare, History, Newspaper,
+  Microscope, MessageSquare,  Newspaper,
   Settings, LogOut, Menu, ChevronLeft
 } from 'lucide-react';
 import edlogo from '../../assets/images/edlogo.png';
@@ -18,7 +18,6 @@ const menuItems = [
 
 const secondaryItems = [
   { id: 'faqs',       label: 'FAQs',           icon: MessageSquare, path: '/admin/faqadmin' },
-  { id: 'history',    label: 'History',        icon: History,       path: '/admin/history' },
   { id: 'aisettings', label: 'AIBot Settings', icon: Settings,      path: '/admin/settings' },
 ];
 

@@ -1,10 +1,7 @@
-# accounts/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-# Always use get_user_model() instead of importing User directly.
-# This respects whatever AUTH_USER_MODEL is set to in settings.py
-# — a Django best practice.
+
 User = get_user_model()
 
 
@@ -27,8 +24,6 @@ class LoginSerializer(serializers.Serializer):
     """
     email = serializers.EmailField()
     password = serializers.CharField(
-        # write_only means this field is accepted as input
-        # but NEVER included in serialized output responses
         write_only=True,
         # style hint for browsable API to render a password input
         style={'input_type': 'password'}

@@ -256,7 +256,6 @@ const AboutZetech = () => {
         </div>
       ))}
       <div className="mt-12 bg-[#1a2b4c] rounded-3xl p-8 relative overflow-hidden">
-        {/* Decorative background icon */}
         <div className="absolute right-6 top-6 opacity-10 text-white">
           <Award size={64} />
         </div>

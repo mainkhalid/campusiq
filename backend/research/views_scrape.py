@@ -125,8 +125,6 @@ def _extract_date(text: str) -> str:
     return ''
 
 
-# ── 1. Discover article links from homepage ───────────────────────────────────
-
 def _discover_article_links() -> list:
     """
     Pull all news article links from the research homepage.
@@ -145,10 +143,9 @@ def _discover_article_links() -> list:
 
             if 'research.zetech.ac.ke' not in parsed.netloc:
                 continue
-            # Only follow /news/ article paths
+            
             if '/index.php/news/' not in parsed.path:
                 continue
-            # Skip generic news index
             if parsed.path.rstrip('/') in ['/index.php/news']:
                 continue
 
@@ -163,8 +160,7 @@ def _discover_article_links() -> list:
         return []
 
 
-# ── 2. Fetch individual article page ─────────────────────────────────────────
-
+# Fetch individual article page 
 def _fetch_article(url: str) -> dict | None:
     """
     Fetch one research news article page.
@@ -176,7 +172,6 @@ def _fetch_article(url: str) -> dict | None:
         if not area:
             return None
 
-        # Title: h2 inside content area (individual article pages use h2)
         title_tag = area.find('h2') or area.find('h1')
         if not title_tag:
             return None
@@ -215,7 +210,7 @@ def _fetch_article(url: str) -> dict | None:
         return None
 
 
-# ── 3. Scrape research projects list ─────────────────────────────────────────
+# Scrape research projects list 
 
 def _scrape_projects() -> list:
     """
@@ -283,9 +278,6 @@ def _scrape_projects() -> list:
         print(f'[ResearchScrape] Projects scrape failed: {e}')
         return []
 
-
-# ── View ──────────────────────────────────────────────────────────────────────
-
 class ScrapeResearchView(APIView):
     """
     POST /api/research/scrape/
@@ -310,8 +302,6 @@ class ScrapeResearchView(APIView):
         errors   = []
         articles = []
         projects = []
-
-        # News articles — discover links then fetch each
         links = _discover_article_links()
         for url in links:
             try:
@@ -432,8 +422,6 @@ class ScrapeResearchView(APIView):
                 if isinstance(tags, str):
                     tags = [t.strip() for t in tags.split(',') if t.strip()]
 
-                # publish=True when called from scrape tab confirm
-                # (frontend passes publish:true); False otherwise
                 should_publish = request.data.get('publish', False)
 
                 ResearchProject.objects.create(
