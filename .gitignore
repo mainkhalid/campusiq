@@ -53,3 +53,4 @@ coverage.xml
 
 backend/media/
 *.pdf
+*.dump

@@ -165,7 +165,6 @@ EMBED_MODEL   = 'qwen/qwen3-embedding-0.6b'
 | GET | `/api/aiconfig/settings/` | Get AI settings |
 
 ---
-
-## License
-
-MIT
+#steps to restore database
+createdb -U postgres zetechdb
+pg_restore -U postgres -d zetechdb zetechdb.dump
