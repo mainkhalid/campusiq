@@ -309,11 +309,6 @@ class AIBotService:
             print('[AIBot] Skipping chunks — pure programme/fee query routed to DB')
             return []
 
-        # Pure news query (no chunk-only topic) — NewsPost DB is enough.
-        # But when a query touches BOTH news AND chunk-only topics
-        # (e.g. "graduation ceremony details", "hostel news", "convocation requirements")
-        # run chunks too — news gives the date/announcement, chunks give the
-        # process details from crawled pages. Both sources contribute.
         if intent['is_news_query'] and not intent['needs_chunks']:
             return []
 
